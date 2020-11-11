@@ -41,6 +41,26 @@ void loop() {
   
   PID_c.PID_Init();
   PID_c.PID_Controller();
+
+  Serial.print(" ESC1: ");Serial.print(mESC1);
+  Serial.print(" ESC2: ");Serial.print(mESC2);
+  Serial.print(" ESC3: ");Serial.print(mESC3);
+  Serial.print(" ESC4: ");Serial.println(mESC4);
+  Serial.print(" Set Roll: ");Serial.print(setVariables[0]);
+  Serial.print(" Set Pitch: ");Serial.print(setVariables[1]);
+  Serial.print(" Set Yaw: ");Serial.print(setVariables[2]);
+  Serial.print(" Set Thrust: ");Serial.print(setVariables[3]);
+  Serial.print(" Input roll: "); Serial.println(integralVariables[0]);
+  Serial.println(" ");
+  Serial.print("Roll: ");Serial.print(outputVariables[0]);
+  Serial.print("  Pitch: ");Serial.print(outputVariables[1]);
+  Serial.print("  Yaw: ");Serial.print(outputVariables[2]);
+  Serial.print("  Thrust: ");Serial.print(setVariables[3]);
+  Serial.print("  Integral: ");Serial.print(integralVariables[0]);
+  Serial.print("  Integral 2: ");Serial.print(integralVariables[1]);
+  Serial.println(" ");
+    
+  
   
   while (micros() - loopTimer < 4000);
   loopTimer = micros();

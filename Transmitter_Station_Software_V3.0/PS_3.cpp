@@ -27,15 +27,12 @@ void PS3_class::PS3_Init(){
     Serial.print("\r\nPS3 USB Library Started");
 }
 
-void PS3_class::reset_buttons(float configTimer){
-  if(millis()- configTimer > 3000){
-  configTimer = millis();
+void PS3_class::reset_buttons(){
   controllerData.xButton = false;
   controllerData.oButton = false;
   controllerData.tButton = false;
   controllerData.sButton = false;
   controllerData.Lt = controllerData.Lb = controllerData.Rt = controllerData.Rb = false;
- }
 }
 
 void PS3_class::read_PS3(){

@@ -14,7 +14,7 @@ extern int calibrate;                          //Calibration variable on startup
 extern float g_raw[4],a_raw[4], g_angle[4], a_angle[4],g_err[4], temperature; 
 extern float alpha_gyro;                 //complementary filter
 extern float alpha_acc;
-
+extern float mESC1, mESC2, mESC3, mESC4, mOffset; //ESC motor variables
 /*------------------- nRF24 Transceiver Global Variables-------------------*/
 typedef struct{                         //Structure Data type to hold rx PS3 state variables
   int Lx;                               //Left Analog stick X data

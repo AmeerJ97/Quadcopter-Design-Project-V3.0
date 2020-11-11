@@ -1,5 +1,6 @@
 #include "Motor_controller.h"
 #include "global_var.h"
+#include "Arduino.h"
 
 #include <Servo.h>
 
@@ -35,7 +36,7 @@ void Motor_class::motor_Init(){
 }
 
 void Motor_class::e_Driver(){
-   analogWrite(greenPin,255);                  //Green Pin to indicate motors signal
+  analogWrite(greenPin,255);                  //Green Pin to indicate motors signal
   analogWrite(redPin,0);
   if (elevate == true){
     motorSpeed = 1450;
@@ -92,13 +93,7 @@ void Motor_class::e_Driver(){
   oESC3.writeMicroseconds(mESC3);
   oESC4.writeMicroseconds(mESC4);
   
-  Serial.print(" ESC1: ");Serial.print(mESC1);
-  Serial.print(" ESC2: ");Serial.print(mESC2);
-  Serial.print(" ESC3: ");Serial.print(mESC3);
-  Serial.print(" ESC4: ");Serial.println(mESC4);
-  
-    
-  
+
   analogWrite(greenPin,0);
 }
 

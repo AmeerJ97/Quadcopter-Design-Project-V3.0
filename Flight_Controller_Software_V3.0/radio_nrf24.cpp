@@ -4,7 +4,6 @@
 
 
 #include <nRF24L01.h>
-#include <printf.h>
 #include <RF24.h>
 #include <RF24_config.h>
 
@@ -35,7 +34,7 @@ void radio_class::radio_Interrupt(){
    }
  if (tx || fail){
   counter++;
-  Serial.println(tx ? F(":OK") : F(":Fail"));
+  //Serial.println(tx ? F(":OK") : F(":Fail"));
  }
 }
 
@@ -44,9 +43,9 @@ void radio_class::radio_Init(){
   rfRadio.setPALevel(RF24_PA_LOW);        //Setting power level to low, microstrip antenna is rx only
   rfRadio.setDataRate(RF24_1MBPS);        //Setting link speed to 1MBps
   if(rfRadio.isChipConnected() == true){
-    Serial.println("nRF24 Chip Connected.");
+    //Serial.println("nRF24 Chip Connected.");
   }else{
-    Serial.println("No nRF24 Chip Found.");
+    //Serial.println("No nRF24 Chip Found.");
   }
   rfRadio.setAutoAck(false);                  //Enable auto ack
  // rfRadio.enableAckPayload();             //Enable ack payload
@@ -56,13 +55,13 @@ void radio_class::radio_Init(){
   rfRadio.openReadingPipe(1,channel_addr);//Open channel 1 to recieve struct type data
   rfRadio.startListening();
   pinMode(pinInt, INPUT);
-  rfRadio.printDetails();
+  //rfRadio.printDetails();
   attachInterrupt(digitalPinToInterrupt(pinInt), radio_Interrupt, CHANGE); //Create interrupt for pin 9 on falling edge
 }
 
 void radio_class::check_radio(){
   if(rfRadio.failureDetected) {          
-       Serial.println("Radio failure, restarting...");
+       //Serial.println("Radio failure, restarting...");
        radio_Init();
    }
 }

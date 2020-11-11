@@ -13,7 +13,7 @@ class PS3_class
     PS3_class();
     void PS3_Init();
     void read_PS3();
-    void reset_buttons(float configTimer);
+    void reset_buttons();
 };
 
 extern PS3_class PS3_c;

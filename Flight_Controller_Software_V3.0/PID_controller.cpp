@@ -47,13 +47,20 @@ void PID_class::PID_Init(){
     elevate = false;
     stopMotors = true;
    }
+  if (controllerData.sButton == true){
+    motorFlag = false;
+    armMotors = false;
+    elevate = false;
+    stopMotors = true;
+    controllerData.sButton = false;
+  }
    
   //State control of quadcopter via PS3 buttons
   if (motorFlag == true && controllerData.xButton == true) armMotors = true;
   if (motorFlag == true && controllerData.oButton == true) elevate = true;
   if (motorFlag == true && controllerData.tButton == true) elevate = false;
-  if (motorFlag == true && controllerData.sButton == true) stopMotors = true;
-  if (motorFlag == true && controllerData.sButton == false) stopMotors = false;
+//  if (motorFlag == true && controllerData.sButton == true) stopMotors = true;
+//  if (motorFlag == true && controllerData.sButton == false) stopMotors = false;
 
 
 
@@ -86,12 +93,7 @@ void PID_class::PID_Init(){
   if(controllerData.Ly > 1590)setVariables[3] = controllerData.Ly - 1590;
   else if(controllerData.Ly < 1410)setVariables[3] = controllerData.Ly - 1410;
   setVariables[3] /= 2;
-  Serial.print(" Set Roll: ");Serial.print(setVariables[0]);
-  Serial.print(" Set Pitch: ");Serial.print(setVariables[1]);
-  Serial.print(" Set Yaw: ");Serial.print(setVariables[2]);
-  Serial.print(" Set Thrust: ");Serial.print(setVariables[3]);
-  Serial.print(" Input roll: "); Serial.println(integralVariables[0]);
-  Serial.println(" ");
+
 }
 
   /* PID Controller Function */ //REMOVED I CONTROLLER
@@ -129,13 +131,7 @@ void PID_class::PID_Controller(){
   else if (outputVariables[2] < -400) outputVariables[2] = -400;
   lastDvariables[2] = fixVariables[2];
 
-  Serial.print("Roll: ");Serial.print(outputVariables[0]);
-  Serial.print("  Pitch: ");Serial.print(outputVariables[1]);
-  Serial.print("  Yaw: ");Serial.print(outputVariables[2]);
-  Serial.print("  Thrust: ");Serial.print(setVariables[3]);
-  Serial.print("  Integral: ");Serial.print(integralVariables[0]);
-  Serial.print("  Integral 2: ");Serial.print(integralVariables[1]);
-  Serial.println(" ");
+
 
 }
 

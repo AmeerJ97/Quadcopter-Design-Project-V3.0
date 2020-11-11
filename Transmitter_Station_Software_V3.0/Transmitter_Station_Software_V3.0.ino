@@ -14,5 +14,8 @@ float configTimer = millis();
 void loop() {
   PS3_c.read_PS3();
   rfRadio_c.radio_tx();
-  PS3_c.reset_buttons(configTimer);
+  if (millis() - configTimer > 2000){
+  PS3_c.reset_buttons();
+  configTimer = millis();
+  }
 } 
