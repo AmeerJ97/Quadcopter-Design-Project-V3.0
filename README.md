@@ -3,7 +3,7 @@ Third Iteration of the flight controller C/C++ code im developing in the arduino
 
 # Hardware
 ## Latest Hardware Image
-<img src="https://github.com/AmeerJ97/Quadcopter-Design-Project-V3.0/blob/master/Images/Lastest_HW_image.jpg" alt="HW figure" width="200">
+<img src="https://github.com/AmeerJ97/Quadcopter-Design-Project-V3.0/blob/master/Images/Lastest_HW_image.jpg" alt="HW figure" width="800">
  
 ## Hardware 'Specs':
   - Components:
