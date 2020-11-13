@@ -40,7 +40,7 @@ void gyro_class::imu_Init(){
     Wire.write(0x10);                     //Set the register as 00010000 indicating readings in +/- 8gs
     Wire.endTransmission();               //End transmission to IMU
     
-    Serial.println("IMU 6050 Initialized");
+    //Serial.println("IMU 6050 Initialized");
     gyro_Init = true;
   }
 }
@@ -77,7 +77,7 @@ void gyro_class::read_Imu(){
 
   /* Gyroscope calibration function */
 void gyro_class::gyro_calibrate(){
-   Serial.print(" Starting Calibration......."); 
+   //Serial.print(" Starting Calibration......."); 
   
   //3000 samples to calibrate
   for (int calibration = 0; calibration < 3000 ; calibration++){     
@@ -88,17 +88,17 @@ void gyro_class::gyro_calibrate(){
   }
   
   calibrate = 3000;                       //Flag for read_Imu() calibration initialization
-  Serial.println(" Calibration complete!");
+ // Serial.println(" Calibration complete!");
   
   g_err[1] /= 3000;
   g_err[2] /= 3000;
   g_err[3] /= 3000;
 
-  Serial.println(" The Calibrated values are:  ");
-  Serial.print(" Gx: ");Serial.print(g_err[1]);
-  Serial.print(" Gy: "); Serial.print(g_err[2]);
-  Serial.print(" Gz: "); Serial.print(g_err[3]);
-  Serial.println(" ");
+//  Serial.println(" The Calibrated values are:  ");
+//  Serial.print(" Gx: ");Serial.print(g_err[1]);
+//  Serial.print(" Gy: "); Serial.print(g_err[2]);
+//  Serial.print(" Gz: "); Serial.print(g_err[3]);
+//  Serial.println(" ");
 }
   /* Gyroscope math function to convert raw deg/s input to current angle */
 void gyro_class::the_Gyroscope(){

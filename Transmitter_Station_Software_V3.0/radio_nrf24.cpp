@@ -18,12 +18,12 @@ radio_class::radio_class(){
 }
 
 void radio_class::radio_Init(){
- printf_begin();
+ //printf_begin();
  rfRadio.begin();                         //Start RF24 object
  rfRadio.setAutoAck(false);               //Disable autoACK
  //rfRadio.enableAckPayload();
  rfRadio.setPALevel(RF24_PA_HIGH);         //Setting power to high for maximum range since this is the transmitter
- //rfRadio.setDataRate(RF24_1MBPS); 
+ rfRadio.setDataRate(RF24_1MBPS); 
  //rfRadio.setCRCLength(RF24_CRC_16);
  if(rfRadio.isChipConnected() == true){
     Serial.println(" ");
@@ -33,7 +33,7 @@ void radio_class::radio_Init(){
   }          
  rfRadio.openWritingPipe(channel_addr);     //Open communication channel
  rfRadio.stopListening(); 
- rfRadio.printDetails();
+// rfRadio.printDetails();
 }
 
 void radio_class::radio_tx(){
@@ -46,9 +46,11 @@ void radio_class::radio_tx(){
     Serial.print(" O: ");Serial.print(controllerData.oButton);
     Serial.print(" X: ");Serial.print(controllerData.xButton);
     Serial.println(" "); 
+ //Stop Listening
+ rfRadio.stopListening();   
  //Writing data to channel or pipe,
  if(!rfRadio.writeFast(&controllerData,sizeof(controllerData))){
-  //Do nothing
+  rfRadio.flush_tx(); //Flush TX buffer
  }
  //If packet transmission failed
  if(!rfRadio.txStandBy(10)){                    //Waits 0.01 second to check transmission status. Flushed FIFO Registers (contain data) on fail.

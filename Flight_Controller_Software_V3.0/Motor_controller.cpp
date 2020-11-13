@@ -82,12 +82,6 @@ void Motor_class::e_Driver(){
   if(mESC4 < 1050) mESC4 = 1050; if(mESC4 > 1750) mESC4 = 1750;  
   }
 
-//  pid.lastoutRoll = pid.outRoll;
-//  pid.lastoutPitch = pid.outPitch;
-//  pid.lastoutYaw = pid.outYaw;
-//  pid.lastelevSet = pid.elevSet;
-//  
-  
   oESC1.writeMicroseconds(mESC1);
   oESC2.writeMicroseconds(mESC2);
   oESC3.writeMicroseconds(mESC3);
@@ -103,4 +97,5 @@ void Motor_class::motor_attach(){
   oESC3.attach(4);
   oESC4.attach(3);
 }
+
 Motor_class Motor_c = Motor_class();

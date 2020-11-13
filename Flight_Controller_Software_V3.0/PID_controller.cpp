@@ -34,13 +34,13 @@ void PID_class::PID_Init(){
     motorFlag = true;
     stopMotors = false;
     armMotors = true;
-    Serial.println("########### MOTOR STARTUP ############");
+   // Serial.println("########### MOTOR STARTUP ############");
     controllerData.Lt = false;
     controllerData.Rt = false;
     
   } else if (controllerData.Lb == true && controllerData.Rb == true){
     motorFlag = false;
-    Serial.println("########### MOTOR SHUTDOWN ############");
+    //Serial.println("########### MOTOR SHUTDOWN ############");
     controllerData.Lb = false;
     controllerData.Rb = false;
     armMotors = false;
@@ -96,7 +96,7 @@ void PID_class::PID_Init(){
 
 }
 
-  /* PID Controller Function */ //REMOVED I CONTROLLER
+  /* PID Controller Function */ 
 void PID_class::PID_Controller(){
    //Roll Calculations
   fixVariables[0] = inputVariables[0] - setVariables[0];                //Calculating error

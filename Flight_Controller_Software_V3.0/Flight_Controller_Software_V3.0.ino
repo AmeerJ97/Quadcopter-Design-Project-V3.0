@@ -4,7 +4,7 @@
 #include "gyro.h"
 #include "PID_controller.h"
 #include "Motor_controller.h"
-#include <Arduino.h>
+#include "Arduino.h"
 
 uint32_t loopTimer;                     //loopTimer to ensure each main loop iteration is 4000microseconds
 
@@ -19,6 +19,9 @@ void setup() {
 
   Motor_c.motor_attach();
   Motor_c.motor_Init();
+
+  interrupts();         //Ensure Interrupts are Enabled
+  
   loopTimer = micros();
 }
 
@@ -30,6 +33,8 @@ void loop() {
     armMotors = false;
   }  
   rfRadio_c.check_radio();
+
+  noInterrupts();         //Disable Interrupts
   
   gyro_c.read_Imu();
   
@@ -38,10 +43,11 @@ void loop() {
   inputVariables[2] = (inputVariables[2] * 0.7) + ((g_raw[3] / 32.8) * 0.3);
 
   gyro_c.the_Gyroscope();
-  
+
   PID_c.PID_Init();
   PID_c.PID_Controller();
-
+  
+  
   Serial.print(" ESC1: ");Serial.print(mESC1);
   Serial.print(" ESC2: ");Serial.print(mESC2);
   Serial.print(" ESC3: ");Serial.print(mESC3);
@@ -64,5 +70,8 @@ void loop() {
   
   while (micros() - loopTimer < 4000);
   loopTimer = micros();
+ 
   Motor_c.e_Driver(); 
+ 
+  interrupts();
 }
