@@ -5,14 +5,14 @@
 //P Variables
 float KP_roll = 1;
 float KP_pitch = 1;
-float KP_yaw = 0.5;
+float KP_yaw = 0.1;
 //I Variables
-float KI_roll = 0.001;
-float KI_pitch = 0.001;
+float KI_roll = 0;
+float KI_pitch = 0;
 float KI_yaw = 0;
 //D Variables
-float KD_roll = 0;
-float KD_pitch = 0;
+float KD_roll = 0.002;
+float KD_pitch = 0.002;
 float KD_yaw = 0;
 
 

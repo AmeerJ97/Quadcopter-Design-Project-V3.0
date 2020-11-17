@@ -12,7 +12,7 @@ boolean motorFlag = true;         //Turn on motors on first iteration
 boolean elevate = false;          //Boolean to control motorSpeed variable
 boolean armMotors = false;        //Boolean to initiate arm motors method
 boolean stopMotors = false;       //Boolean to stop the quadcopter
-float mESC1, mESC2, mESC3, mESC4, mOffset; //ESC motor variables
+int mESC1, mESC2, mESC3, mESC4, mOffset; //ESC motor variables
 
 Servo oESC1,oESC2,oESC3,oESC4;    //Declaring ESC Motors as objects
 
@@ -35,6 +35,26 @@ void Motor_class::motor_Init(){
   analogWrite(yellowPin, 0);
 }
 
+void Motor_class::port_Init(){
+  DDRD != B01111000;                          //Configuring ports 6,5,4,3 as outputs
+}
+
+void Motor_class::gen_Pulse(uint32_t loopTimer, int esc1, int esc2, int esc3, int esc4){
+  PORTD |= B01111000;       //Set ports 3, 4, 5, 6 to high
+  esc_timer_1 = mESC1 + loopTimer;
+  esc_timer_2 = mESC2 + loopTimer;
+  esc_timer_3 = mESC3 + loopTimer;
+  esc_timer_4 = mESC4 + loopTimer;
+
+  while(PORTD >= 16){
+    esc_loop_timer = micros();
+    if(esc_timer_1 <= esc_loop_timer) PORTD &= B10111111; //Set ESC1 or port 6 to low
+    if(esc_timer_2 <= esc_loop_timer) PORTD &= B11011111; //Set ESC2 or port 5 to low
+    if(esc_timer_3 <= esc_loop_timer) PORTD &= B11101111; //Set ESC3 or port 4 to low
+    if(esc_timer_4 <= esc_loop_timer) PORTD &= B11110111; //Set ESC4 or port 3 to low
+  }
+  
+}
 void Motor_class::e_Driver(){
   analogWrite(greenPin,255);                  //Green Pin to indicate motors signal
   analogWrite(redPin,0);

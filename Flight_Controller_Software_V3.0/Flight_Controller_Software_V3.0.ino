@@ -25,7 +25,7 @@ void setup() {
   loopTimer = micros();
 }
 
-uint32_t configTimer =  millis();  
+uint32_t configTimer =  millis(); 
 
 void loop() {
   if (armMotors == true && motorFlag == true ){    //Re-arming ESC if requested
@@ -34,7 +34,8 @@ void loop() {
   }  
   rfRadio_c.check_radio();
 
-  noInterrupts();         //Disable Interrupts
+
+  analogWrite(redPin, 0);
   
   gyro_c.read_Imu();
   
@@ -68,10 +69,12 @@ void loop() {
     
   
   
-  while (micros() - loopTimer < 4000);
+  while (micros() - loopTimer < 4000);    //Ensuring arduino 250Hz Clock
   loopTimer = micros();
+
  
-  Motor_c.e_Driver(); 
+    Motor_c.e_Driver(); 
  
-  interrupts();
+ 
+
 }
