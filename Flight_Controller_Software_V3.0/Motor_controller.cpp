@@ -1,6 +1,7 @@
 #include "Motor_controller.h"
 #include "global_var.h"
 #include "Arduino.h"
+#include "gyro.h"
 
 #include <Servo.h>
 
@@ -13,7 +14,7 @@ boolean elevate = false;          //Boolean to control motorSpeed variable
 boolean armMotors = false;        //Boolean to initiate arm motors method
 boolean stopMotors = false;       //Boolean to stop the quadcopter
 int mESC1, mESC2, mESC3, mESC4, mOffset; //ESC motor variables
-
+uint32_t esc_timer_1, esc_timer_2, esc_timer_3, esc_timer_4;
 Servo oESC1,oESC2,oESC3,oESC4;    //Declaring ESC Motors as objects
 
 Motor_class::Motor_class(){
@@ -35,19 +36,35 @@ void Motor_class::motor_Init(){
   analogWrite(yellowPin, 0);
 }
 
+void Motor_class::motor_port_Init(){
+  analogWrite(yellowPin, 255);
+    PORTD |= B01111000;       //Set ports 3, 4, 5, 6 to high
+    delayMicroseconds(2000);
+    PORTD &= B10000111;
+    delay(5000);
+    PORTD |= B01111000;       //Set ports 3, 4, 5, 6 to high
+    delayMicroseconds(1000);
+    PORTD &= B10000111;
+    delayMicroseconds(5000);
+    analogWrite(yellowPin, 0);
+}
+
 void Motor_class::port_Init(){
   DDRD != B01111000;                          //Configuring ports 6,5,4,3 as outputs
 }
 
-void Motor_class::gen_Pulse(uint32_t loopTimer, int esc1, int esc2, int esc3, int esc4){
+void Motor_class::gen_Pulse(uint32_t loop_Timer){
+  analogWrite(greenPin,255);
+  analogWrite(redPin,0);
   PORTD |= B01111000;       //Set ports 3, 4, 5, 6 to high
-  esc_timer_1 = mESC1 + loopTimer;
-  esc_timer_2 = mESC2 + loopTimer;
-  esc_timer_3 = mESC3 + loopTimer;
-  esc_timer_4 = mESC4 + loopTimer;
+  esc_timer_1 = mESC1 + loop_Timer;
+  esc_timer_2 = mESC2 + loop_Timer;
+  esc_timer_3 = mESC3 + loop_Timer;
+  esc_timer_4 = mESC4 + loop_Timer;
 
-  while(PORTD >= 16){
-    esc_loop_timer = micros();
+  while(PORTD >= 136){
+    analogWrite(greenPin,0);
+    uint32_t esc_loop_timer = micros();
     if(esc_timer_1 <= esc_loop_timer) PORTD &= B10111111; //Set ESC1 or port 6 to low
     if(esc_timer_2 <= esc_loop_timer) PORTD &= B11011111; //Set ESC2 or port 5 to low
     if(esc_timer_3 <= esc_loop_timer) PORTD &= B11101111; //Set ESC3 or port 4 to low
@@ -56,8 +73,8 @@ void Motor_class::gen_Pulse(uint32_t loopTimer, int esc1, int esc2, int esc3, in
   
 }
 void Motor_class::e_Driver(){
-  analogWrite(greenPin,255);                  //Green Pin to indicate motors signal
-  analogWrite(redPin,0);
+  //analogWrite(greenPin,255);                  //Green Pin to indicate motors signal
+
   if (elevate == true){
     motorSpeed = 1450;
     mOffset = 100;
@@ -102,13 +119,15 @@ void Motor_class::e_Driver(){
   if(mESC4 < 1050) mESC4 = 1050; if(mESC4 > 1750) mESC4 = 1750;  
   }
 
-  oESC1.writeMicroseconds(mESC1);
-  oESC2.writeMicroseconds(mESC2);
-  oESC3.writeMicroseconds(mESC3);
-  oESC4.writeMicroseconds(mESC4);
-  
 
-  analogWrite(greenPin,0);
+  
+//  oESC1.writeMicroseconds(mESC1);
+//  oESC2.writeMicroseconds(mESC2);
+//  oESC3.writeMicroseconds(mESC3);
+//  oESC4.writeMicroseconds(mESC4);
+//  
+
+  //analogWrite(greenPin,0);
 }
 
 void Motor_class::motor_attach(){

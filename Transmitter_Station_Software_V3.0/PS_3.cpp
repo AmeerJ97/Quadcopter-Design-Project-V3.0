@@ -60,9 +60,9 @@ void PS3_class::read_PS3(){
     
     //Deadband to avoid PS3 joystick fluctuations
     if((controllerData.Lx < 1750) && (controllerData.Lx > 1250)) controllerData.Lx = 1500;
-    if((controllerData.Ly < 1600) && (controllerData.Ly > 1400)) controllerData.Ly = 1500;
-    if((controllerData.Rx < 1600) && (controllerData.Rx > 1400)) controllerData.Rx = 1500;
-    if((controllerData.Ry < 1600) && (controllerData.Ry > 1400)) controllerData.Ry = 1500;
+    if((controllerData.Ly < 1750) && (controllerData.Ly > 1250)) controllerData.Ly = 1500;
+    if((controllerData.Rx < 1750) && (controllerData.Rx > 1250)) controllerData.Rx = 1500;
+    if((controllerData.Ry < 1750) && (controllerData.Ry > 1250)) controllerData.Ry = 1500;
 
 //    Serial.print("Lx: ");Serial.print(controllerData.Lx);
 //    Serial.print(" Ly: ");Serial.print(controllerData.Ly);

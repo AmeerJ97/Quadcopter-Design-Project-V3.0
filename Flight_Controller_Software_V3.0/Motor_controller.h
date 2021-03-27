@@ -14,7 +14,8 @@ class Motor_class{
     void motor_attach();
     void e_Driver();
     void port_Init();
-    void gen_Pulse(uint32_t loopTimer, int esc1, int esc2, int esc3, int esc4);
+    void gen_Pulse(uint32_t loop_Timer);
+    void motor_port_Init();
 };
 
 extern Motor_class Motor_c;

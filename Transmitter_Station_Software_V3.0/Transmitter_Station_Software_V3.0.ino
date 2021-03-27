@@ -19,6 +19,4 @@ void loop() {
   PS3_c.reset_buttons();
   configTimer = millis();
   }
-  while(micros() - loopTimer < 4000); //Enforcing 250Hz clock
-  loopTimer = micros();
 } 

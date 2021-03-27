@@ -18,8 +18,10 @@ void setup() {
   rfRadio_c.radio_Init();
 
   Motor_c.motor_attach();
-  Motor_c.motor_Init();
-
+  //Motor_c.motor_Init();
+  Motor_c.port_Init();
+  Motor_c.motor_port_Init();
+  
   interrupts();         //Ensure Interrupts are Enabled
   
   loopTimer = micros();
@@ -66,15 +68,15 @@ void loop() {
   Serial.print("  Integral: ");Serial.print(integralVariables[0]);
   Serial.print("  Integral 2: ");Serial.print(integralVariables[1]);
   Serial.println(" ");
-    
+   
   
   
   while (micros() - loopTimer < 4000);    //Ensuring arduino 250Hz Clock
   loopTimer = micros();
-
+  
  
-    Motor_c.e_Driver(); 
- 
+  Motor_c.e_Driver(); 
+  Motor_c.gen_Pulse(loopTimer);
  
 
 }
