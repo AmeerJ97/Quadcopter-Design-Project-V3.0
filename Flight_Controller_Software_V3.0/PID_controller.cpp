@@ -3,19 +3,19 @@
 
 /*------------------- PID Variables-------------------*/
 //P Variables
-float KP_roll = 1;
-float KP_pitch = 1;
-float KP_yaw = 0.1;
+float KP_roll = 0.05;
+float KP_pitch = 0.05;
+float KP_yaw = 0.0001;
 //I Variables
-float KI_roll = 0;
-float KI_pitch = 0;
+float KI_roll = 0.00005;
+float KI_pitch = 0.00005;
 float KI_yaw = 0;
 //D Variables
-float KD_roll = 0.002;
-float KD_pitch = 0.002;
+float KD_roll = 0.00005;
+float KD_pitch = 0.00005;
 float KD_yaw = 0;
 
-
+int flag = 1;
 float setVariables[4] = {0,0,0,0};       //roll set, pitch set, yaw set, elevation set
 float fixVariables[3] = {0,0,0};         //roll fix, pitch fix, yaw pitch 
 float inputVariables[3] = {0,0,0};       //roll input, pitch input, yaw input
@@ -29,70 +29,64 @@ PID_class::PID_class(){
 
   /* PID initialization function to input controller data */
 void PID_class::PID_Init(){
-  /* Motor Startup condition via L2 and R2, R1 and L1 stop motors */
-  if (controllerData.Lt == true && controllerData.Rt == true){
-    motorFlag = true;
-    stopMotors = false;
-    armMotors = true;
-   // Serial.println("########### MOTOR STARTUP ############");
-    controllerData.Lt = false;
-    controllerData.Rt = false;
-    
-  } else if (controllerData.Lb == true && controllerData.Rb == true){
-    motorFlag = false;
-    //Serial.println("########### MOTOR SHUTDOWN ############");
-    controllerData.Lb = false;
-    controllerData.Rb = false;
-    armMotors = false;
-    elevate = false;
-    stopMotors = true;
-   }
+  //State control of quadcopter via PS3 buttons
   if (controllerData.sButton == true){
     motorFlag = false;
-    armMotors = false;
     elevate = false;
     stopMotors = true;
     controllerData.sButton = false;
   }
-   
-  //State control of quadcopter via PS3 buttons
-  if (motorFlag == true && controllerData.xButton == true) armMotors = true;
+  if (controllerData.xButton == true){
+    motorFlag = true;
+    stopMotors = false;
+    controllerData.xButton = false;
+  }
   if (motorFlag == true && controllerData.oButton == true) elevate = true;
   if (motorFlag == true && controllerData.tButton == true) elevate = false;
-//  if (motorFlag == true && controllerData.sButton == true) stopMotors = true;
-//  if (motorFlag == true && controllerData.sButton == false) stopMotors = false;
 
+  if (counter >= 15) radio_online == false;
+  counter ++;
+  
+  if (auto_pilot == false || radio_online == false){
+    flag = 0;
+  }else {
+    flag = 1;
+  }
 
-
+  
   /* Pid setpoint controlled by PS3 controller */
   //Requires a deadband of 90 due to PS3 input fluctuations
   //Thus, maximum set roll input is 164.0 deg/s
   //Roll Set calculations
   setVariables[0] = 0;
-  if (controllerData.Rx > 1590)setVariables[0] = (controllerData.Rx - 1590) ;
-  else if (controllerData.Rx < 1410)setVariables[0] = (controllerData.Rx - 1410);
-  setVariables[0] -= g_angle[1] * 15;          //Gyroscope roll correction
+  if (controllerData.Rx > 1512)setVariables[0] = (controllerData.Rx - 1512) ;
+  else if (controllerData.Rx < 1488)setVariables[0] = (controllerData.Rx - 1488);
+  setVariables[0] -= g_angle[1] * 15 * flag;          //Gyroscope roll correction
   setVariables[0] /= 3;
 
 
   //Pitch Set calculations
   setVariables[1] = 0;
-  if (controllerData.Ry > 1590)setVariables[1] = controllerData.Ry - 1590;
-  else if (controllerData.Ry < 1410)setVariables[1] =  controllerData.Ry - 1410;
-  setVariables[1] -= g_angle[2]* 15;
+  if (controllerData.Ry > 1512)setVariables[1] = 1512 - controllerData.Ry;
+  else if (controllerData.Ry < 1488)setVariables[1] = 1488 - controllerData.Ry;
+  setVariables[1] -= g_angle[2]* 15 * flag;
   setVariables[1] /= 3;
 
   //Yaw Set calculations
   setVariables[2] = 0;
-  if(controllerData.Lx > 1590)setVariables[2] = controllerData.Lx - 1590;
-  else if(controllerData.Lx < 1410)setVariables[2] = controllerData.Lx - 1410;
+  if(controllerData.Lx > 1512)setVariables[2] = controllerData.Lx - 1512;
+  else if(controllerData.Lx < 1488)setVariables[2] = controllerData.Lx - 1488;
   setVariables[2] /= 5;
   
   //Elevation set calculations
   setVariables[3] = 0;
-  if(controllerData.Ly > 1590)setVariables[3] = controllerData.Ly - 1590;
-  else if(controllerData.Ly < 1410)setVariables[3] = controllerData.Ly - 1410;
+  if(controllerData.Ly > 1512)setVariables[3] = controllerData.Ly - 1512;
+  else if(controllerData.Ly < 1488)setVariables[3] = controllerData.Ly - 1488;
   setVariables[3] /= 2;
+
+  if (radio_online == false){
+    setVariables[0] = setVariables[1] = setVariables[2] = setVariables[3] = 0;
+  }
 
 }
 
@@ -104,7 +98,7 @@ void PID_class::PID_Controller(){
   if (integralVariables[0] > 400) integralVariables[0] = 400;           //Upper limit on integral controller
   else if (integralVariables[0] <= -400) integralVariables[0] = -400;  //Lower limit on integral controller
 
-  outputVariables[0] = KP_roll * fixVariables[0] +integralVariables[0] + KD_roll * (fixVariables[0] - lastDvariables[0]);
+  outputVariables[0] = KP_roll * fixVariables[0] + integralVariables[0] + KD_roll * (fixVariables[0] - lastDvariables[0]);
   if (outputVariables[0] > 400) outputVariables[0] = 400;
   else if (outputVariables[0] < -400) outputVariables[0] = -400;
   lastDvariables[0] = fixVariables[0];
@@ -115,7 +109,7 @@ void PID_class::PID_Controller(){
   if (integralVariables[1] > 400) integralVariables[1] = 400;
   else if (integralVariables[1] <= -400) integralVariables[1] = -400;
 
-  outputVariables[1] = KP_pitch * fixVariables[1]  + KD_pitch * (fixVariables[1] - lastDvariables[1]);
+  outputVariables[1] = KP_pitch * fixVariables[1] + integralVariables[1] + KD_pitch * (fixVariables[1] - lastDvariables[1]);
   if (outputVariables[1] > 400) outputVariables[1] = 400;
   else if (outputVariables[1] < -400) outputVariables[1] = -400;
   lastDvariables[1] = fixVariables[1];

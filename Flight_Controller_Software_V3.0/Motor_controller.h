@@ -10,12 +10,12 @@
 class Motor_class{
   public:
     Motor_class();
-    void motor_Init();
     void motor_attach();
     void e_Driver();
     void port_Init();
     void gen_Pulse(uint32_t loop_Timer);
     void motor_port_Init();
+    void motor_drive();
 };
 
 extern Motor_class Motor_c;

@@ -16,8 +16,8 @@ const int pinCE = 7;
 const int pinCSN = 8;
 const int pinInt = 2;                   //Pin used for nRF24 interrupts
 uint64_t channel_addr = 0xB00B1E5000LL; //Channel address
-unsigned long counter;                  //Counter to track failed packets
-
+int counter;                  //Counter to track failed packets
+boolean radio_online = false;
 RF24 rfRadio(pinCE,pinCSN);             //Declaring nRF24 Object
 
 radio_class::radio_class(){
@@ -30,9 +30,12 @@ void radio_class::radio_Interrupt(){
   rfRadio.whatHappened(tx,fail,rx);       
  //Read data on rx
  if (rx){
-   rfRadio.read(&controllerData,sizeof(controllerData));
+    rfRadio.read(&controllerData,sizeof(controllerData));
+    radio_online = true;
+    counter = 0;
    }
 
+   
 }
 
 void radio_class::radio_Init(){
@@ -56,8 +59,8 @@ void radio_class::radio_Init(){
 }
 
 void radio_class::check_radio(){
-  if(rfRadio.failureDetected) {          
-    //ReInitialize Radio
+  if(rfRadio.failureDetected || radio_online == false) {          
+    //ReInitialize Radio and set radio flag to false
        radio_Init();
    }
 }

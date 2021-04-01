@@ -12,8 +12,8 @@ bool gyro_Init = false;
 int calibrate;                          //Calibration variable on startup
 //Gyro and accelerometer (X,Y,Z) arrays and temperature variable(s) 
 float g_raw[4],a_raw[4], g_angle[4], a_angle[4],g_err[4], temperature; 
-float alpha_gyro = 0.9;                 //complementary filter
-float alpha_acc = 0.1;
+float alpha_gyro = 0.95;                 //complementary filter
+float alpha_acc = 0.05;
 
 gyro_class::gyro_class(){
 }
@@ -54,12 +54,12 @@ void gyro_class::read_Imu(){
   Wire.requestFrom(imu_addr, 14);         //Request 14 bytes from IMU starting at Acc out register
   while(Wire.available() < 14);           //Waiting for the 14 bytes to be recieved
 
-  a_raw[1] = Wire.read()<<8 | Wire.read();  //Reading 8 bytes from high and low Acc X output Register 
-  a_raw[2] = Wire.read()<<8 | Wire.read();  //Reading 8 bytes from high and low Acc Y output Register 
+  a_raw[2] = Wire.read()<<8 | Wire.read();  //Reading 8 bytes from high and low Acc X output Register 
+  a_raw[1] = Wire.read()<<8 | Wire.read();  //Reading 8 bytes from high and low Acc Y output Register 
   a_raw[3] = Wire.read()<<8 | Wire.read();  //Reading 8 bytes from high and low Acc Z output Register 
   temperature = Wire.read()<<8 | Wire.read(); //Reading 8 bytes from high and low temperature output register
-  g_raw[1] = Wire.read()<<8 | Wire.read();  //Reading 8 bytes from high and low Gyro X output Register 
-  g_raw[2] = Wire.read()<<8 | Wire.read();  //Reading 8 bytes from high and low Gyro Y output Register 
+  g_raw[2] = Wire.read()<<8 | Wire.read();  //Reading 8 bytes from high and low Gyro X output Register 
+  g_raw[1] = Wire.read()<<8 | Wire.read();  //Reading 8 bytes from high and low Gyro Y output Register 
   g_raw[3] = Wire.read()<<8 | Wire.read();  //Reading 8 bytes from high and low Gyro Z output Register 
   
   Wire.endTransmission();
@@ -77,7 +77,7 @@ void gyro_class::read_Imu(){
 
   /* Gyroscope calibration function */
 void gyro_class::gyro_calibrate(){
-   //Serial.print(" Starting Calibration......."); 
+  //Serial.print(" Starting Calibration......."); 
   
   //3000 samples to calibrate
   for (int calibration = 0; calibration < 3000 ; calibration++){     
@@ -104,12 +104,12 @@ void gyro_class::gyro_calibrate(){
 void gyro_class::the_Gyroscope(){
   //Discrete summation multiplied by dt equivalent to continous integration
   //where dt = 1  / ( f * 32.8) where f is the frequency of the microcontroller and 32.8 is the selected sensitivity upon gyroscope configuration
-  g_angle[1] += g_raw[1] * (1/(32.8 * 250));     //Roll Angle Gx
-  g_angle[2] += g_raw[2] * (1/(32.8 * 250));     //Pitch Angle  Gy
-  g_angle[3] += g_raw[3] * (1/(32.8 * 250));     //Yaw Angle  Gz
+  g_angle[1] += g_raw[1] * (1/(250 / 65.5));     //Roll Angle Gx
+  g_angle[2] += g_raw[2] * (1/(250 / 65.5));     //Pitch Angle Gy
+  g_angle[3] += g_raw[3] * (1/(250 / 65.5));     //Yaw Angle  Gz
 
-  g_angle[2] -= g_angle[1] * sin(g_raw[3] * (1/(32.8 * 250)) * (1 / 57.29577)); //Pitch
-  g_angle[1] += g_angle[2] * sin(g_raw[3] * (1/(32.8 * 250)) * (1 / 57.29577)); //Roll
+  g_angle[2] -= g_angle[1] * sin(g_raw[3] * (1/(250 / 65.5)) * (1 / 57.29577)); //Pitch
+  g_angle[1] += g_angle[2] * sin(g_raw[3] * (1/(250 / 65.5)) * (1 / 57.29577)); //Roll
 
   //Calculating accelerometer vector to determine direction of acceleration
   float acc_vector = sqrt((a_raw[1] * a_raw[1]) + (a_raw[2] * a_raw[2]) + (a_raw[3] * a_raw[3]));
@@ -121,10 +121,14 @@ void gyro_class::the_Gyroscope(){
     a_angle[1] = asin((float) a_raw[1] / acc_vector) * rad_2_deg;
   }
 
-  //Hardcoded second calibration for accelerometer
-  a_angle[1] += 2;                   //Ax
-  a_angle[2] += 0;                  //Ay
+  //Hardcoded second calibration for accelerometer and gyro
+  a_angle[1] += 0;                   //Ax
+  a_angle[2] += 1;                  //Ay
   a_angle[3] += 0;                   //Az
+
+  g_angle[1] -= 2.2;
+  g_angle[2] += 1.2;
+  g_angle[3] -= 0;
 
   //On first run, set gyro X&Y angle values equal to acc X&Y angle values for initial stability
   //If not, implement complementary filter 
@@ -135,11 +139,18 @@ void gyro_class::the_Gyroscope(){
     g_angle[1] = g_angle[1] * alpha_gyro + a_angle[1] * alpha_acc;
     g_angle[1] = g_angle[2] * alpha_gyro + a_angle[2] * alpha_acc;
   } 
-//   Serial.print("Gx_angle: ");Serial.print(g_angle[1]);
-//  Serial.print("  Gy_angle: ");Serial.print(g_angle[2]);
-//  Serial.print("  Gz_raw: ");Serial.print(g_raw[3]);
-//  Serial.print("  Ax_angle: ");Serial.print(a_angle[1]);
-//  Serial.print("  Ay_angle: ");Serial.print(a_angle[2]);
-//  Serial.print("  Az_raw: ");Serial.print(a_raw[3]);
-//  Serial.println(" ");
+  Serial.print("  Gx_angle: ");Serial.print(g_angle[1]);
+  Serial.print("  Gy_angle: ");Serial.print(g_angle[2]);
+  Serial.print("  Gz_angle: ");Serial.print(g_angle[3]);
+  Serial.print("  Gx_raw: ");Serial.print(g_raw[1]);
+  Serial.print("  Gy_raw: ");Serial.print(g_raw[2]);
+  Serial.print("  Gz_raw: ");Serial.print(g_raw[3]);
+  Serial.println(" ");
+  Serial.print("  Ax_angle: ");Serial.print(a_angle[1]);
+  Serial.print("  Ay_angle: ");Serial.print(a_angle[2]);
+  Serial.print("  Az_angle: ");Serial.print(a_angle[3]);
+  Serial.print("  Ax_raw: ");Serial.print(a_raw[1]);
+  Serial.print("  Ay_raw: ");Serial.print(a_raw[2]);
+  Serial.print("  Az_raw: ");Serial.print(a_raw[3]);
+  Serial.println(" ");
 }

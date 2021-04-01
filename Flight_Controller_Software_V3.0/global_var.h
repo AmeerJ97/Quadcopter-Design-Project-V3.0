@@ -15,6 +15,8 @@ extern float g_raw[4],a_raw[4], g_angle[4], a_angle[4],g_err[4], temperature;
 extern float alpha_gyro;                 //complementary filter
 extern float alpha_acc;
 /*------------------- nRF24 Transceiver Global Variables-------------------*/
+extern bool radio_online;
+extern int counter;
 typedef struct{                         //Structure Data type to hold rx PS3 state variables
   int Lx;                               //Left Analog stick X data
   int Ly;                               //Left Analog stick Y data
@@ -45,6 +47,6 @@ extern unsigned long esc_timer_1, esc_timer_2, esc_timer_3, esc_timer_4, esc_loo
 extern int motorSpeed;               //Base ESC speed for all Motors
 extern bool motorFlag;         //Turn on motors on first iteration
 extern bool elevate;          //Boolean to control motorSpeed variable
-extern bool armMotors;        //Boolean to initiate arm motors method
+extern bool auto_pilot;       //Boolean to initiate arm motors method
 extern bool stopMotors;       //Boolean to stop the quadcopter
 #endif
