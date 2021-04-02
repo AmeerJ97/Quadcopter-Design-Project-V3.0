@@ -7,6 +7,7 @@ extern const int bluePin = A0;                       //Blue LED pin
 extern const int redPin = A1;                        //Red LED pin
 extern const int yellowPin = A2;                     //Yellow LED pin
 extern const int greenPin = A3;                      //Green LED pin
+extern const int whitePin = A4;                      //White LED pin
 
 led_class::led_class(){
 }
@@ -17,6 +18,7 @@ void led_class::led_Init(){
   pinMode(redPin, OUTPUT);
   pinMode(yellowPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
+  pinMode(whitePin, OUTPUT);
 }
 
 led_class led_c = led_class();
