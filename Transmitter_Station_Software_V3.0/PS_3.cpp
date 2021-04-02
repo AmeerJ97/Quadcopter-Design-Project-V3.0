@@ -32,6 +32,7 @@ void PS3_class::reset_buttons(){
   controllerData.oButton = false;
   controllerData.tButton = false;
   controllerData.sButton = false;
+  controllerData.upB = controllerData.downB = controllerData.rightB = controllerData.leftB = false;
   controllerData.Lt = controllerData.Lb = controllerData.Rt = controllerData.Rb = false;
 }
 
@@ -50,7 +51,10 @@ void PS3_class::read_PS3(){
     if(PS3.getButtonClick(L2))controllerData.Lt = true;
     if(PS3.getButtonClick(R1))controllerData.Rb = true;
     if(PS3.getButtonClick(R2))controllerData.Rt = true; 
-    
+    if(PS3.getButtonClick(UP))controllerData.upB = true;
+    if(PS3.getButtonClick(DOWN))controllerData.downB = true;
+    if(PS3.getButtonClick(RIGHT))controllerData.rightB = true;
+    if(PS3.getButtonClick(LEFT))controllerData.leftB = true;    
     //Mapping and shifting analog data such that 1500 is the center point
     controllerData.Lx = map(controllerData.Lx,0,255,1000,2000) ;
     controllerData.Rx = map(controllerData.Rx,0,255,1000,2000) ;

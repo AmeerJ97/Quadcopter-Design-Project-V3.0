@@ -103,7 +103,7 @@ void gyro_class::gyro_calibrate(){
   /* Gyroscope math function to convert raw deg/s input to current angle */
 void gyro_class::the_Gyroscope(){
   //Discrete summation multiplied by dt equivalent to continous integration
-  //where dt = 1  / ( f * 32.8) where f is the frequency of the microcontroller and 32.8 is the selected sensitivity upon gyroscope configuration
+  //where dt = 1  / ( f * 65.5) where f is the frequency of the microcontroller(250hz) and 65.5 is the selected sensitivity upon gyroscope configuration
   g_angle[1] += g_raw[1] * (1/(250 / 65.5));     //Roll Angle Gx
   g_angle[2] += g_raw[2] * (1/(250 / 65.5));     //Pitch Angle Gy
   g_angle[3] += g_raw[3] * (1/(250 / 65.5));     //Yaw Angle  Gz
@@ -121,14 +121,7 @@ void gyro_class::the_Gyroscope(){
     a_angle[1] = asin((float) a_raw[1] / acc_vector) * rad_2_deg;
   }
 
-  //Hardcoded second calibration for accelerometer and gyro
-  a_angle[1] += 0;                   //Ax
-  a_angle[2] += 1;                  //Ay
-  a_angle[3] += 0;                   //Az
 
-  g_angle[1] -= 2.2;
-  g_angle[2] += 1.2;
-  g_angle[3] -= 0;
 
   //On first run, set gyro X&Y angle values equal to acc X&Y angle values for initial stability
   //If not, implement complementary filter 
@@ -137,8 +130,25 @@ void gyro_class::the_Gyroscope(){
     g_angle[2] = a_angle[2];
   }else {
     g_angle[1] = g_angle[1] * alpha_gyro + a_angle[1] * alpha_acc;
-    g_angle[1] = g_angle[2] * alpha_gyro + a_angle[2] * alpha_acc;
+    g_angle[2] = g_angle[2] * alpha_gyro + a_angle[2] * alpha_acc;
   } 
+
+  //Deadband for gyro roll/pitch 
+  
+  if(g_angle[1] <= 2 && g_angle[1] >= -2)g_angle[1] = 0;
+  if(g_angle[2] <= 2.5 && g_angle[2] >= -2.5)g_angle[2] = 0;
+  
+  if(a_angle[1] <= 2 && a_angle[1] >= -2)a_angle[1] = 0;
+  if(a_angle[2] <= 2.6 && a_angle[2] >= -2.6)a_angle[2] = 0;
+  
+  //Hardcoded second calibration for accelerometer and gyro
+  a_angle[1] += 0;                   //Ax
+  a_angle[2] += 0;                  //Ay  1
+  a_angle[3] += 0;                   //Az
+
+  g_angle[1] -= 0;        // 2.2
+  g_angle[2] += 0;        // 1.2
+  g_angle[3] -= 0;
   Serial.print("  Gx_angle: ");Serial.print(g_angle[1]);
   Serial.print("  Gy_angle: ");Serial.print(g_angle[2]);
   Serial.print("  Gz_angle: ");Serial.print(g_angle[3]);

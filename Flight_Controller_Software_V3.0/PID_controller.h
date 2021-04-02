@@ -12,6 +12,8 @@ class PID_class{
   PID_class();
   void PID_Init();
   void PID_Controller();
+  void Init_PID();
+  void reset_Integral();
 };
 
 extern PID_class PID_c;

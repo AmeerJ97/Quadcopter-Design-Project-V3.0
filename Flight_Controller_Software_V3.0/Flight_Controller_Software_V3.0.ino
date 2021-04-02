@@ -7,6 +7,7 @@
 #include "Arduino.h"
 
 uint32_t loopTimer;                     //loopTimer to ensure each main loop iteration is 4000microseconds
+uint32_t timer_i;                       //integral loop timer
 
 void setup() {
   Serial.begin(57600);
@@ -14,6 +15,7 @@ void setup() {
   
   gyro_c.imu_Init();
   gyro_c.gyro_calibrate();
+  PID_c.Init_PID();
 
   rfRadio_c.radio_Init();
 
@@ -26,10 +28,19 @@ void setup() {
   interrupts();         //Ensure Interrupts are Enabled
   
   loopTimer = micros();
+  timer_i = micros();
+  
 }
 
 
 void loop() {
+  
+  if(loopTimer - timer_i > 30000000 ){
+    PID_c.reset_Integral();
+    timer_i = micros();
+  }
+  Serial.println(timer_i);
+  Serial.println(loopTimer);
   
   rfRadio_c.check_radio();
   
@@ -60,15 +71,14 @@ void loop() {
   Serial.println(" ");
   Serial.print(" In Roll: ");Serial.print(inputVariables[0]);
   Serial.print(" In Pitch: ");Serial.print(inputVariables[1]);
-  Serial.print(" In Yaw: ");Serial.print(inputVariables[2]);
-  Serial.println(" ");
+  Serial.print(" In Yaw: ");Serial.println(inputVariables[2]);
   Serial.print(" Roll: ");Serial.print(outputVariables[0]);
   Serial.print("  Pitch: ");Serial.print(outputVariables[1]);
   Serial.print("  Yaw: ");Serial.print(outputVariables[2]);
-  Serial.print("  Thrust: ");Serial.print(setVariables[3]);
-//  Serial.print("  Integral: ");Serial.print(integralVariables[0]);
-//  Serial.print("  Integral 2: ");Serial.print(integralVariables[1]);
-
+  Serial.print("  Thrust: ");Serial.println(setVariables[3]);
+  Serial.print("  Integral roll: ");Serial.print(integralVariables[0]);
+  Serial.print("  Integral pitch: ");Serial.print(integralVariables[1]);
+  Serial.print("  Integral yaw: ");Serial.println(integralVariables[2]);
 
   if(micros() - loopTimer > 4050)digitalWrite(yellowPin, HIGH);
   

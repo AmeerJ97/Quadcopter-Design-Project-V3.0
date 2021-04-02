@@ -12,5 +12,9 @@ typedef struct{
   bool Lb;
   bool Rt;
   bool Rb;
+  bool upB;
+  bool downB;
+  bool rightB;
+  bool leftB;
 }controllerStruct;
 extern controllerStruct controllerData;

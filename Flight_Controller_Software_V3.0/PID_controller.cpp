@@ -3,17 +3,17 @@
 
 /*------------------- PID Variables-------------------*/
 //P Variables
-float KP_roll = 0.05;
-float KP_pitch = 0.05;
-float KP_yaw = 0.0001;
+float KP_roll = 0.0008;         //0.02 , 0,005
+float KP_pitch = 0.0008;        //0.02 , 0,005
+float KP_yaw = 0.05;        //0.0003 , 0.088
 //I Variables
-float KI_roll = 0.00005;
-float KI_pitch = 0.00005;
-float KI_yaw = 0;
+float KI_roll = 0.0000088;     //0.000005 , 0,00000088
+float KI_pitch = 0.0000088;     //0.00005, 0,00000088
+float KI_yaw = 0.0000044;     //0.0000005, 0,0000044
 //D Variables
-float KD_roll = 0.00005;
-float KD_pitch = 0.00005;
-float KD_yaw = 0;
+float KD_roll = 0.008;         //0.04 , 0,008
+float KD_pitch = 0.008;        //0.04 , 0,008
+float KD_yaw = 0.000;             //0.00 , 0,000
 
 int flag = 1;
 float setVariables[4] = {0,0,0,0};       //roll set, pitch set, yaw set, elevation set
@@ -27,6 +27,14 @@ controllerStruct controllerData;
 PID_class::PID_class(){
 }
 
+void PID_class::Init_PID(){
+  lastDvariables[0] = lastDvariables[1] = 0;
+  integralVariables[0] = integralVariables[1] = integralVariables[2] = 0;
+}
+
+void PID_class::reset_Integral(){
+  integralVariables[0] = integralVariables[1] = integralVariables[2] = 0;
+}
   /* PID initialization function to input controller data */
 void PID_class::PID_Init(){
   //State control of quadcopter via PS3 buttons
@@ -41,6 +49,8 @@ void PID_class::PID_Init(){
     stopMotors = false;
     controllerData.xButton = false;
   }
+
+  
   if (motorFlag == true && controllerData.oButton == true) elevate = true;
   if (motorFlag == true && controllerData.tButton == true) elevate = false;
 
@@ -53,30 +63,35 @@ void PID_class::PID_Init(){
     flag = 1;
   }
 
+  while(!radio_online){
+    controllerData.Rx = controllerData.Lx = 1500;
+    controllerData.Ry = controllerData.Ly = 1500;
+  }
   
   /* Pid setpoint controlled by PS3 controller */
-  //Requires a deadband of 90 due to PS3 input fluctuations
+  //Requires a deadband of 12 due to PS3 input fluctuations
   //Thus, maximum set roll input is 164.0 deg/s
   //Roll Set calculations
   setVariables[0] = 0;
-  if (controllerData.Rx > 1512)setVariables[0] = (controllerData.Rx - 1512) ;
-  else if (controllerData.Rx < 1488)setVariables[0] = (controllerData.Rx - 1488);
-  setVariables[0] -= g_angle[1] * 15 * flag;          //Gyroscope roll correction
+  if (controllerData.Rx > 1512)setVariables[0] = 15 * (controllerData.Rx  - 1512) ;
+  else if (controllerData.Rx < 1488)setVariables[0] = 15 * (controllerData.Rx - 1488);
+  setVariables[0] -= g_angle[1] * 7 * flag;          //Gyroscope roll correction
   setVariables[0] /= 3;
-
+  //setVariables[0] += 4;
 
   //Pitch Set calculations
   setVariables[1] = 0;
-  if (controllerData.Ry > 1512)setVariables[1] = 1512 - controllerData.Ry;
-  else if (controllerData.Ry < 1488)setVariables[1] = 1488 - controllerData.Ry;
-  setVariables[1] -= g_angle[2]* 15 * flag;
+  if (controllerData.Ry > 1512)setVariables[1] = 15 * (1512 - controllerData.Ry);
+  else if (controllerData.Ry < 1488)setVariables[1] = 15 * (1488 - controllerData.Ry);
+  setVariables[1] -= g_angle[2] * 7 * flag;
   setVariables[1] /= 3;
-
+  //setVariables[1] -= 1;
+  
   //Yaw Set calculations
   setVariables[2] = 0;
   if(controllerData.Lx > 1512)setVariables[2] = controllerData.Lx - 1512;
   else if(controllerData.Lx < 1488)setVariables[2] = controllerData.Lx - 1488;
-  setVariables[2] /= 5;
+  setVariables[2] /= 1.5;
   
   //Elevation set calculations
   setVariables[3] = 0;
@@ -120,7 +135,7 @@ void PID_class::PID_Controller(){
   if (integralVariables[2] > 400) integralVariables[2] = 400;
   else if (integralVariables[2] <= -400) integralVariables[2] = -400;
 
-  outputVariables[2] = KP_yaw * fixVariables[2]  + KD_yaw * (fixVariables[2] - lastDvariables[2]);
+  outputVariables[2] = KP_yaw * fixVariables[2] + integralVariables[2] + KD_yaw * (fixVariables[2] - lastDvariables[2]);
   if (outputVariables[2] > 400) outputVariables[2] = 400;
   else if (outputVariables[2] < -400) outputVariables[2] = -400;
   lastDvariables[2] = fixVariables[2];

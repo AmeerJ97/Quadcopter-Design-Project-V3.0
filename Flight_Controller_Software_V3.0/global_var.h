@@ -30,6 +30,10 @@ typedef struct{                         //Structure Data type to hold rx PS3 sta
   bool Lb;                           //Left bumper L2
   bool Rt;                           //Right trigger R1
   bool Rb;                           //Right bumper R2
+  bool upB;
+  bool downB;
+  bool rightB;
+  bool leftB;
 }controllerStruct;
 extern controllerStruct controllerData;
 /*------------------- PID Global Variables-------------------*/
