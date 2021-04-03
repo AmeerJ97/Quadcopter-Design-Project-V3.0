@@ -2,12 +2,12 @@
 #define led_
 
 #if (ARDUINO >= 100)
-  #include "Arduino.h"
+#include "Arduino.h"
 #else
-  #include "WProgram.h"
+#include "WProgram.h"
 #endif
 
-class led_class{
+class led_class {
   public:
     led_class();
     void led_Init();

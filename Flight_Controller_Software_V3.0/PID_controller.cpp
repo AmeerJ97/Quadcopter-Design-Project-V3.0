@@ -3,71 +3,40 @@
 
 /*------------------- PID Variables-------------------*/
 //P Variables
-float KP_roll = 0.0008;         //0.02 , 0,005
-float KP_pitch = 0.0008;        //0.02 , 0,005
-float KP_yaw = 0.05;        //0.0003 , 0.088
+float KP_roll = 0.0008;           //0.02 , 0,005
+float KP_pitch = 0.0008;          //0.02 , 0,005
+float KP_yaw = 0.05;              //0.0003 , 0.088
 //I Variables
-float KI_roll = 0.0000088;     //0.000005 , 0,00000088
-float KI_pitch = 0.0000088;     //0.00005, 0,00000088
-float KI_yaw = 0.0000044;     //0.0000005, 0,0000044
+float KI_roll = 0.000028;        //0.000005 , 0,00000088
+float KI_pitch = 0.000028;       //0.00005, 0,00000088
+float KI_yaw = 0.000014;         //0.0000005, 0,0000044
 //D Variables
-float KD_roll = 0.008;         //0.04 , 0,008
-float KD_pitch = 0.008;        //0.04 , 0,008
+float KD_roll = 0.008;            //0.04 , 0,008
+float KD_pitch = 0.008;           //0.04 , 0,008
 float KD_yaw = 0.000;             //0.00 , 0,000
 
-int flag = 1;
-float setVariables[4] = {0,0,0,0};       //roll set, pitch set, yaw set, elevation set
-float fixVariables[3] = {0,0,0};         //roll fix, pitch fix, yaw pitch 
-float inputVariables[3] = {0,0,0};       //roll input, pitch input, yaw input
-float integralVariables[3] = {0,0,0};    //roll integral, pitch integral, yaw integral
-float outputVariables[6] = {0,0,0,0,0,0};//roll output, pitch output, yaw output, last roll output, last pitch output, last yaw output
-float lastDvariables[3] = {0,0,0};       //roll last D, pitch last D, yaw last D
+float setVariables[4] = {0, 0, 0, 0};    //roll set, pitch set, yaw set, elevation set
+float fixVariables[3] = {0, 0, 0};       //roll fix, pitch fix, yaw pitch
+float inputVariables[3] = {0, 0, 0};     //roll input, pitch input, yaw input
+float integralVariables[3] = {0, 0, 0};  //roll integral, pitch integral, yaw integral
+float outputVariables[6] = {0, 0, 0, 0, 0, 0}; //roll output, pitch output, yaw output, last roll output, last pitch output, last yaw output
+float lastDvariables[3] = {0, 0, 0};     //roll last D, pitch last D, yaw last D
 controllerStruct controllerData;
 
-PID_class::PID_class(){
+PID_class::PID_class() {
 }
 
-void PID_class::Init_PID(){
+void PID_class::Init_PID() {
   lastDvariables[0] = lastDvariables[1] = 0;
   integralVariables[0] = integralVariables[1] = integralVariables[2] = 0;
 }
 
-void PID_class::reset_Integral(){
+void PID_class::reset_Integral() {
   integralVariables[0] = integralVariables[1] = integralVariables[2] = 0;
 }
-  /* PID initialization function to input controller data */
-void PID_class::PID_Init(){
-  //State control of quadcopter via PS3 buttons
-  if (controllerData.sButton == true){
-    motorFlag = false;
-    elevate = false;
-    stopMotors = true;
-    controllerData.sButton = false;
-  }
-  if (controllerData.xButton == true){
-    motorFlag = true;
-    stopMotors = false;
-    controllerData.xButton = false;
-  }
 
-  
-  if (motorFlag == true && controllerData.oButton == true) elevate = true;
-  if (motorFlag == true && controllerData.tButton == true) elevate = false;
-
-  if (counter >= 15) radio_online == false;
-  counter ++;
-  
-  if (auto_pilot == false || radio_online == false){
-    flag = 0;
-  }else {
-    flag = 1;
-  }
-
-  while(!radio_online){
-    controllerData.Rx = controllerData.Lx = 1500;
-    controllerData.Ry = controllerData.Ly = 1500;
-  }
-  
+/* PID initialization function to input controller data */
+void PID_class::PID_Init() {
   /* Pid setpoint controlled by PS3 controller */
   //Requires a deadband of 12 due to PS3 input fluctuations
   //Thus, maximum set roll input is 164.0 deg/s
@@ -77,7 +46,6 @@ void PID_class::PID_Init(){
   else if (controllerData.Rx < 1488)setVariables[0] = 15 * (controllerData.Rx - 1488);
   setVariables[0] -= g_angle[1] * 7 * flag;          //Gyroscope roll correction
   setVariables[0] /= 3;
-  //setVariables[0] += 4;
 
   //Pitch Set calculations
   setVariables[1] = 0;
@@ -85,33 +53,32 @@ void PID_class::PID_Init(){
   else if (controllerData.Ry < 1488)setVariables[1] = 15 * (1488 - controllerData.Ry);
   setVariables[1] -= g_angle[2] * 7 * flag;
   setVariables[1] /= 3;
-  //setVariables[1] -= 1;
-  
+
   //Yaw Set calculations
   setVariables[2] = 0;
-  if(controllerData.Lx > 1512)setVariables[2] = controllerData.Lx - 1512;
-  else if(controllerData.Lx < 1488)setVariables[2] = controllerData.Lx - 1488;
+  if (controllerData.Lx > 1512)setVariables[2] = controllerData.Lx - 1512;
+  else if (controllerData.Lx < 1488)setVariables[2] = controllerData.Lx - 1488;
   setVariables[2] /= 1.5;
-  
+
   //Elevation set calculations
   setVariables[3] = 0;
-  if(controllerData.Ly > 1512)setVariables[3] = controllerData.Ly - 1512;
-  else if(controllerData.Ly < 1488)setVariables[3] = controllerData.Ly - 1488;
+  if (controllerData.Ly > 1512)setVariables[3] = controllerData.Ly - 1512;
+  else if (controllerData.Ly < 1488)setVariables[3] = controllerData.Ly - 1488;
   setVariables[3] /= 2;
 
-  if (radio_online == false){
+  if (radio_online == false) {
     setVariables[0] = setVariables[1] = setVariables[2] = setVariables[3] = 0;
   }
 
 }
 
-  /* PID Controller Function */ 
-void PID_class::PID_Controller(){
-   //Roll Calculations
+/* PID Controller Function */
+void PID_class::PID_Controller() {
+  //Roll Calculations
   fixVariables[0] = inputVariables[0] - setVariables[0];                //Calculating error
   integralVariables[0] += KI_roll * fixVariables[0];                    //Integral Controller
   if (integralVariables[0] > 400) integralVariables[0] = 400;           //Upper limit on integral controller
-  else if (integralVariables[0] <= -400) integralVariables[0] = -400;  //Lower limit on integral controller
+  else if (integralVariables[0] <= -400) integralVariables[0] = -400;   //Lower limit on integral controller
 
   outputVariables[0] = KP_roll * fixVariables[0] + integralVariables[0] + KD_roll * (fixVariables[0] - lastDvariables[0]);
   if (outputVariables[0] > 400) outputVariables[0] = 400;
@@ -139,9 +106,6 @@ void PID_class::PID_Controller(){
   if (outputVariables[2] > 400) outputVariables[2] = 400;
   else if (outputVariables[2] < -400) outputVariables[2] = -400;
   lastDvariables[2] = fixVariables[2];
-
-
-
 }
 
 PID_class PID_c = PID_class();

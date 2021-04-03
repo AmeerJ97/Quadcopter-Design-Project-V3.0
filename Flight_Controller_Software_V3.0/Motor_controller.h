@@ -2,12 +2,12 @@
 #define _MOTOR_GUARD_
 
 #if (ARDUINO >= 100)
-  #include "Arduino.h"
+#include "Arduino.h"
 #else
-  #include "WProgram.h"
+#include "WProgram.h"
 #endif
 
-class Motor_class{
+class Motor_class {
   public:
     Motor_class();
     void motor_attach();
@@ -16,6 +16,7 @@ class Motor_class{
     void gen_Pulse(uint32_t loop_Timer);
     void motor_port_Init();
     void motor_drive();
+    void motor_sleep();
 };
 
 extern Motor_class Motor_c;
