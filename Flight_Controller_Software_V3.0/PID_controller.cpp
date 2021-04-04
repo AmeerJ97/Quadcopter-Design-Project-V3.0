@@ -5,10 +5,10 @@
 //P Variables
 float KP_roll = 0.0008;           //0.02 , 0,005
 float KP_pitch = 0.0008;          //0.02 , 0,005
-float KP_yaw = 0.05;              //0.0003 , 0.088
+float KP_yaw = 0.005;              //0.0003 , 0.088
 //I Variables
-float KI_roll = 0.000028;        //0.000005 , 0,00000088
-float KI_pitch = 0.000028;       //0.00005, 0,00000088
+float KI_roll = 0.0000014;        //0.000005 , 0,00000088
+float KI_pitch = 0.0000014;       //0.00005, 0,00000088
 float KI_yaw = 0.000014;         //0.0000005, 0,0000044
 //D Variables
 float KD_roll = 0.008;            //0.04 , 0,008
@@ -44,14 +44,14 @@ void PID_class::PID_Init() {
   setVariables[0] = 0;
   if (controllerData.Rx > 1512)setVariables[0] = 15 * (controllerData.Rx  - 1512) ;
   else if (controllerData.Rx < 1488)setVariables[0] = 15 * (controllerData.Rx - 1488);
-  setVariables[0] -= g_angle[1] * 7 * flag;          //Gyroscope roll correction
+  setVariables[0] -= g_angle[1] * 15 * flag;          //Gyroscope roll correction
   setVariables[0] /= 3;
 
   //Pitch Set calculations
   setVariables[1] = 0;
   if (controllerData.Ry > 1512)setVariables[1] = 15 * (1512 - controllerData.Ry);
   else if (controllerData.Ry < 1488)setVariables[1] = 15 * (1488 - controllerData.Ry);
-  setVariables[1] -= g_angle[2] * 7 * flag;
+  setVariables[1] -= g_angle[2] * 15 * flag;
   setVariables[1] /= 3;
 
   //Yaw Set calculations

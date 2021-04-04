@@ -122,7 +122,8 @@ void gyro_class::the_Gyroscope() {
     a_angle[1] = asin((float) a_raw[1] / acc_vector) * rad_2_deg;
   }
 
-
+   a_angle[1] -= 1;                   //Ax
+   a_angle[2] += 1.2;                  //Ay  
 
   //On first run, set gyro X&Y angle values equal to acc X&Y angle values for initial stability
   //If not, implement complementary filter
